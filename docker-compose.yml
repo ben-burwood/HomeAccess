@@ -15,9 +15,9 @@ services:
     image: nginx:latest
     container_name: nginx
     environment:
-      - SERVER_NAME=${SERVER_NAME}
+      - SERVER_HOST=${SERVER_HOST}
     volumes:
-      - ./nginx:/etc/nginx:ro
+      - ./nginx:/etc/nginx
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
     ports:

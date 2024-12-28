@@ -1,0 +1,3 @@
+map "" $server_host {
+    default ${SERVER_HOST};
+}
