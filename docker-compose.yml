@@ -1,13 +1,4 @@
 services:
-  duckdns:
-    image: ghcr.io/linuxserver/duckdns:latest
-    container_name: duckdns
-    environment:
-      - SUBDOMAINS=${DUCKDNS_SUBDOMAINS}
-      - TOKEN=${DUCKDNS_TOKEN}
-      - TZ=Europe/London
-    restart: unless-stopped
-
   nginx:
     image: nginx:latest
     container_name: nginx
@@ -15,8 +6,7 @@ services:
       - SERVER_HOST=${SERVER_HOST}
     volumes:
       - ./nginx:/etc/nginx
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - ./data/letsencrypt:/etc/letsencrypt
     ports:
       - 80:80
       - 443:443
@@ -28,9 +18,38 @@ services:
       retries: 1
       start_period: 15s
 
+  duckdns:
+    image: ghcr.io/linuxserver/duckdns:latest
+    container_name: duckdns
+    environment:
+      - SUBDOMAINS=${DUCKDNS_SUBDOMAIN}
+      - TOKEN=${DUCKDNS_TOKEN}
+      - TZ=Europe/London
+    restart: unless-stopped
+
   certbot:
-    image: certbot/dns-cloudflare
+    image: infinityofspace/certbot_dns_duckdns:latest
+    container_name: certbot_duckdns
     volumes:
-      - ./certbot/cloudflare.ini:/root/cloudflare.ini:ro
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - ./data/letsencrypt:/etc/letsencrypt
+      - ./data/logs:/var/log/letsencrypt
+      - ./nginx/reload.sh:/usr/local/bin/nginx/reload.sh:ro
+    command: certonly
+      --non-interactive
+      --agree-tos
+      --email ${CERTBOT_EMAIL}
+      --preferred-challenges dns
+      --authenticator dns-duckdns
+      --dns-duckdns-token ${DUCKDNS_TOKEN}
+      --dns-duckdns-propagation-seconds 30
+      -d "*.${DUCKDNS_SUBDOMAIN}.duckdns.org"
+
+  certbot_renew:
+    build: certbot/.
+    container_name: certbot_renew
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CERTBOT_CONTAINER_NAME=certbot_duckdns
+      - NGINX_CONTAINER_NAME=nginx
