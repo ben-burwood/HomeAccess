@@ -1,0 +1,21 @@
+server {
+    listen 80;
+
+    server_name ${SERVER_HOST} *.${SERVER_HOST};
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    include conf.d/ssl.conf;
+
+    server_name ${SERVER_HOST} *.${SERVER_HOST};
+
+    location /health {
+        add_header 'Content-Type' 'application/json';
+        return 200 '{"status":"healthy"}';
+    }
+}

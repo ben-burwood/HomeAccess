@@ -4,6 +4,8 @@ services:
     container_name: nginx
     environment:
       - SERVER_HOST=${SERVER_HOST}
+      - HOME_ASSISTANT_HOST=${HOME_ASSISTANT_HOST}
+      - MEDIA_HOST=${MEDIA_HOST}
     volumes:
       - ./nginx:/etc/nginx
       - ./data/letsencrypt:/etc/letsencrypt

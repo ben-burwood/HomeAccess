@@ -1,6 +1,7 @@
-
 .env
 
-nginx/conf.d/var.conf
+nginx/conf.d/main.conf
+nginx/conf.d/ssl.conf
+nginx/conf.d/servers/
 
 data/
