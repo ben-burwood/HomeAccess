@@ -8,6 +8,7 @@ services:
       - MEDIA_HOST=${MEDIA_HOST}
     volumes:
       - ./nginx:/etc/nginx
+      - ./static:/usr/share/nginx/html:ro
       - letsencrypt:/etc/letsencrypt
     ports:
       - 80:80
