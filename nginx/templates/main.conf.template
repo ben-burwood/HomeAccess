@@ -18,4 +18,6 @@ server {
         add_header 'Content-Type' 'application/json';
         return 200 '{"status":"healthy"}';
     }
+
+    include conf.d/error.conf;
 }
